@@ -1,5 +1,8 @@
 package exorath.cloud.apigateway;
 
+import io.vertx.core.http.HttpMethod;
+import io.vertx.ext.web.Router;
+
 import java.util.ArrayList;
 
 /**
@@ -18,7 +21,7 @@ public class RouteMapper {
         return null;
     }
 
-    public Route getRouteByPath(String path, String method) {
+    Route getRouteByPath(String path, String method) {
         for (Route route : routes) {
             if (route.path.equalsIgnoreCase(path) && route.method.equalsIgnoreCase(method)) {
                 return route;
@@ -28,13 +31,19 @@ public class RouteMapper {
     }
 
     public void addRoute(Route route) {
-        if (getRouteByDomain(route.domain, route.method) == null || getRouteByPath(route.path, route.method) == null) {
+        if (getRouteByPath(route.path, route.method) == null) {
             routes.add(route);
         }
     }
 
-    public void removeRoute(Route route) {
+    void removeRoute(Route route) {
         routes.remove(route);
+    }
+
+    void updateRouter(Router router) {
+        for (Route route : routes) {
+            router.route(HttpMethod.valueOf(route.method), route.path).handler(Main.service::proxyConnection);
+        }
     }
 
     public class Route {

@@ -15,8 +15,8 @@ import java.util.Iterator;
  */
 public class MongoDBProvider implements DatabaseProvider {
 
-    MongoClient mongoClient;
-    MongoDatabase db;
+    private MongoClient mongoClient;
+    private MongoDatabase db;
 
     MongoDBProvider(ServerAddress serverAddress, MongoCredential credential, String database) {
         mongoClient = new MongoClient(serverAddress, Arrays.asList(credential));

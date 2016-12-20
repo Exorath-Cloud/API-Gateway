@@ -10,7 +10,7 @@ import io.vertx.core.Vertx;
 public class Main {
 
     public static Service service;
-    public static DatabaseProvider databaseProvider;
+    static DatabaseProvider databaseProvider;
 
     public static void main(String[] args) {
 //        int port = Integer.parseInt(System.getenv("PORT"));
