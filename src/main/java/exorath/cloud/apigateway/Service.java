@@ -38,7 +38,6 @@ public class Service extends AbstractVerticle{
     }
 
     private void addRoute(RoutingContext routingContext) {
-
     }
 
     private void proxyConnection(RoutingContext routingContext) {
