@@ -42,13 +42,12 @@ public class Service extends AbstractVerticle {
 
     @Override
     public void start() {
-        router = Router.router(vertx);
-        router.route().handler(BodyHandler.create());
-        router.post("/apigateway/add/").handler(this::addRoute);
-        proxyRouter = Router.router(vertx);
-        router.mountSubRouter("/", proxyRouter);
-        vertx.createHttpServer().requestHandler(router::accept).listen(port);
-        client = vertx.createHttpClient(new HttpClientOptions());
+        setupRouter();
+        setupHttpServer();
+        setupVaildiator();
+    }
+
+    private void setupVaildiator() {
         executor = Executors.newFixedThreadPool(ROUTE_VAILD_THREAD);
         scheduledExecutor.scheduleAtFixedRate(() -> {
             for (RouteMapper.Route route : routeMapper.routes) {
@@ -64,16 +63,29 @@ public class Service extends AbstractVerticle {
         });
     }
 
+    private void setupHttpServer(){
+        vertx.createHttpServer().requestHandler(router::accept).listen(port);
+        client = vertx.createHttpClient(new HttpClientOptions());
+    }
+
+    private void setupRouter(){
+        router = Router.router(vertx);
+        router.route().handler(BodyHandler.create());
+        router.post("/apigateway/add/").handler(this::addRoute);
+        proxyRouter = Router.router(vertx);
+        router.mountSubRouter("/", proxyRouter);
+    }
+
     private void addRoute(RoutingContext routingContext) {
         HttpServerResponse res = routingContext.response();
         RouteAddRequest routeAddRequest = new RouteAddRequest(new GsonBuilder().create().fromJson(routingContext.getBodyAsString(), RouteMapper.Route.class));
         RouteAddResponse routeAddResponse = routeAddRequest.process();
-        res.end(routeAddResponse.getBody());
         res.setStatusCode(routeAddResponse.getStatus());
+        res.end(routeAddResponse.getBody());
         Main.databaseProvider.saveRouteMapper(routeMapper);
     }
 
-    void proxyConnection(RoutingContext routingContext) {
+    void rerouteRequest(RoutingContext routingContext) {
         HttpServerRequest req = routingContext.request();
         HttpServerResponse res = routingContext.response();
         RouteMapper.Route route = routeMapper.getRouteByPath(req.path(), req.method().toString());

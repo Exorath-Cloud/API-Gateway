@@ -21,6 +21,7 @@ public class MongoDBProvider implements DatabaseProvider {
     MongoDBProvider(ServerAddress serverAddress, MongoCredential credential, String database) {
         mongoClient = new MongoClient(serverAddress, Arrays.asList(credential));
         db = mongoClient.getDatabase(database);
+        db.getCollection("routes").drop();
     }
 
     @Override

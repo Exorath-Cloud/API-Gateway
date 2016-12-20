@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 public class RouteMapper {
 
-    ArrayList<Route> routes = new ArrayList<Route>();
+    ArrayList<Route> routes = new ArrayList<>();
 
     public Route getRouteByDomain(String domain, String method) {
         for (Route route : routes) {
@@ -42,7 +42,7 @@ public class RouteMapper {
 
     void updateRouter(Router router) {
         for (Route route : routes) {
-            router.route(HttpMethod.valueOf(route.method), route.path).handler(Main.service::proxyConnection);
+            router.route(HttpMethod.valueOf(route.method), route.path).handler(Main.service::rerouteRequest);
         }
     }
 
