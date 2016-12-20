@@ -2,12 +2,10 @@ package exorath.cloud.apigateway.transactions;
 
 import com.google.gson.GsonBuilder;
 
-import java.util.Date;
-
 /**
  * Created by Connor on 12/19/2016.
  */
-public class RouteAddResponse implements Response{
+public class RouteAddResponse implements Response {
 
     int status;
     String errorMessage;
