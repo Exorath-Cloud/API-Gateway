@@ -5,12 +5,12 @@ import com.google.gson.GsonBuilder;
 /**
  * Created by Connor on 12/19/2016.
  */
-public class RouteAddResponse implements Response {
+public class APIAddResponse implements Response {
 
     int status;
     String errorMessage;
 
-    RouteAddResponse(int status, String errorMessage) {
+    APIAddResponse(int status, String errorMessage) {
         this.status = status;
         this.errorMessage = errorMessage;
     }

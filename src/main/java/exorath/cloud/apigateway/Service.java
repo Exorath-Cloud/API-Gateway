@@ -5,8 +5,10 @@ package exorath.cloud.apigateway;
  */
 
 import com.google.gson.GsonBuilder;
-import exorath.cloud.apigateway.transactions.RouteAddRequest;
-import exorath.cloud.apigateway.transactions.RouteAddResponse;
+import exorath.cloud.apigateway.data.API;
+import exorath.cloud.apigateway.data.Route;
+import exorath.cloud.apigateway.transactions.APIAddRequest;
+import exorath.cloud.apigateway.transactions.APIAddResponse;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.http.*;
@@ -14,8 +16,6 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 
-import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -24,19 +24,14 @@ public class Service extends AbstractVerticle {
 
     private final int ROUTE_VAILD_LOOP = 10;
     private final int ROUTE_VAILD_THREAD = 6;
-    public RouteMapper routeMapper = new RouteMapper();
     HttpClient client;
-    ExecutorService executor;
     ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
     int port;
     private Router router;
     private Router proxyRouter;
+    public APIManager apiManager = new APIManager();
 
     Service(int port) {
-        routeMapper = Main.databaseProvider.loadRouteMapper();
-        if (routeMapper.routes == null) {
-            routeMapper.routes = new ArrayList<>();
-        }
         this.port = port;
     }
 
@@ -44,20 +39,15 @@ public class Service extends AbstractVerticle {
     public void start() {
         setupRouter();
         setupHttpServer();
-        setupVaildiator();
+        setupUpdate();
     }
 
-    private void setupVaildiator() {
-        executor = Executors.newFixedThreadPool(ROUTE_VAILD_THREAD);
+    private void setupUpdate() {
         scheduledExecutor.scheduleAtFixedRate(() -> {
-            for (RouteMapper.Route route : routeMapper.routes) {
-                executor.execute(new RouteValidator(route));
-            }
-            routeMapper.updateRouter(proxyRouter);
+
         }, 0, ROUTE_VAILD_LOOP, TimeUnit.SECONDS);
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                executor.shutdown();
                 scheduledExecutor.shutdown();
             }
         });
@@ -78,17 +68,16 @@ public class Service extends AbstractVerticle {
 
     private void addRoute(RoutingContext routingContext) {
         HttpServerResponse res = routingContext.response();
-        RouteAddRequest routeAddRequest = new RouteAddRequest(new GsonBuilder().create().fromJson(routingContext.getBodyAsString(), RouteMapper.Route.class));
-        RouteAddResponse routeAddResponse = routeAddRequest.process();
+        APIAddRequest routeAddRequest = new APIAddRequest(new GsonBuilder().create().fromJson(routingContext.getBodyAsString(), API.class));
+        APIAddResponse routeAddResponse = routeAddRequest.process();
         res.setStatusCode(routeAddResponse.getStatus());
         res.end(routeAddResponse.getBody());
-        Main.databaseProvider.saveRouteMapper(routeMapper);
     }
 
-    void rerouteRequest(RoutingContext routingContext) {
+    public void rerouteRequest(RoutingContext routingContext) {
         HttpServerRequest req = routingContext.request();
         HttpServerResponse res = routingContext.response();
-        RouteMapper.Route route = routeMapper.getRouteByPath(req.path(), req.method().toString());
+        Route route = Main.service.apiManager.getRouteByPath(req.path(), req.method());
         HttpClientRequest proxy_req;
         Handler<HttpClientResponse> httpHandle = proxy_res -> {
             res.setChunked(true);
@@ -108,7 +97,6 @@ public class Service extends AbstractVerticle {
                 proxy_req.write(routingContext.getBody());
             }
         }
-
     }
 
 
