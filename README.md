@@ -27,6 +27,6 @@ The logging component will log requests to our logging platform.
  
 ```json
 {
-  "varname": value
+  "varname": "value"
 }
 ```
