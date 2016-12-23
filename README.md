@@ -27,8 +27,8 @@ The logging component will log requests to our logging platform.
  
 ```json
 {
-  "eventvars": {
-     "eventvar": "value"
-  }
+   "eventvars":{
+      "eventvar":"value"
+   }
 }
 ```
