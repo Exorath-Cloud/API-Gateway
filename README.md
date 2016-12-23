@@ -20,3 +20,13 @@ This component is responsible for charging a certain amount credits per request.
 
 ##Logging component
 The logging component will log requests to our logging platform.
+
+##Event Varibles
+ 
+ These are varibles attached to the body of a requestthat has been rerouted by the api gateway
+ 
+```json
+{
+  "varname": value
+}
+```
