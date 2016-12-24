@@ -25,26 +25,26 @@ The logging component will log requests to our logging platform.
  
 A service must be configuraged in the following manner
 ```json
-{
- "name": "exmaple-service",
- "routes": {
-    "route":{
-      "public": "path/to/serivce",
-      "rpivate": "path/to/serivce",
-      "mappings":{
-        ":param": "eventvar"
+{  
+   "name":"exmaple-service",
+   "routes":{  
+      "route":{  
+         "public":"path/to/serivce",
+         "rpivate":"path/to/serivce",
+         "mappings":{  
+            ":param":"eventvar"
+         }
       }
-    }
- }
+   }
 }
 ```
 
 ## Event Varibles
 These varibles are passed to the incoming reuqest by the event handlers. An example being the preauthorization event, which may map
 ```json
-{
- "authenticated": "true",
- "userid": "1233h123ghj123ghj23hg"
+{  
+   "authenticated":"true",
+   "userid":"1233h123ghj123ghj23hg"
 }
 ```
 
