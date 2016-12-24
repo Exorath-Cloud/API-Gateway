@@ -21,14 +21,31 @@ This component is responsible for charging a certain amount credits per request.
 ##Logging component
 The logging component will log requests to our logging platform.
 
-##Event Varibles
+#Configuration
  
- These are varibles attached to the body of a requestthat has been rerouted by the api gateway
- 
+A service must be configuraged in the following manner
 ```json
 {
-   "eventvars":{
-      "eventvar":"value"
-   }
+ "name": "exmaple-service",
+ "routes": {
+    "route":{
+      "public": "path/to/serivce",
+      "rpivate": "path/to/serivce",
+      "mappings":{
+        ":param": "eventvar"
+      }
+    }
+ }
 }
 ```
+
+## Event Varibles
+These varibles are passed to the incoming reuqest by the event handlers. An example being the preauthorization event, which may map
+```json
+{
+ "authenticated": "true",
+ "userid": "1233h123ghj123ghj23hg"
+}
+```
+
+The following varibles are then mapped to the according params passed in the service configuration
