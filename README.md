@@ -30,7 +30,7 @@ A service must be configuraged in the following manner
    "routes":{  
       "route":{  
          "public":"path/to/serivce",
-         "rpivate":"path/to/serivce",
+         "private":"path/to/serivce",
          "mappings":{  
             ":param":"eventvar"
          }
